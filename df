@@ -1,0 +1,63 @@
+[33mcommit 2b8d8f9f0ddd608f4d4a830496fedfed2a4fa2ca[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Merge: 8c00db7 26d428f
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 18:27:13 2019 +0800
+
+    i
+    merge message
+    
+    Merge branch 'testbranch'
+
+[33mcommit 26d428f5b5340609e13a66aa9b40a164797e5d04[m[33m ([m[1;31morigin/testbranch[m[33m)[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 18:23:39 2019 +0800
+
+    add new texture shell_3
+
+[33mcommit 8c00db7623d83e3a0c7da9db3a273b3174eeeaac[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 18:17:04 2019 +0800
+
+    hotfix add shell_2
+
+[33mcommit 5ca7565e4f75c436f11686c600a511c1e58f85b1[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 18:14:43 2019 +0800
+
+    add shell_1
+
+[33mcommit 77ee9a113f83cf3d862217cb3ab9167c034fe5e9[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 18:10:33 2019 +0800
+
+    add a new jpg
+
+[33mcommit 4e9ed690dc064a06e8c3c8ca0c5cc74bb4acb206[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 14:58:13 2019 +0800
+
+    delete 11.jpg
+
+[33mcommit 5a216514296fb4375ab991cbb13275bada3058ba[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 14:55:44 2019 +0800
+
+    delete two
+
+[33mcommit 6c7aed99b8d705595c78be4603264d308af8a19c[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 14:30:47 2019 +0800
+
+    two picture
+
+[33mcommit f97895674983f0582ac197914895becbc5ff851e[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 14:01:39 2019 +0800
+
+    test a change in scene,and imported a new texture
+
+[33mcommit 660196619aad88071b7b468904da2b88806c4e54[m
+Author: Yanqi <wojiaoyanqi@sina.com>
+Date:   Mon Jan 7 11:57:36 2019 +0800
+
+    enmpty unity f
