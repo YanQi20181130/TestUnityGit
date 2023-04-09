@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<players>
+    <player id="1",NAME="狐狸">
+           
+        <part descript="耳朵左", id ="part_1">38_443,34_415,52_408</part>
+		<part descript="耳朵右", id ="part_2">236_432,256_437,264</part>
+		<part descript="鼻子", id ="part_3">154_256,153_239,159</part>
+		<part descript="后腿左", id ="part_4">197_38,212_41,198</part>
+		<part descript="后腿右", id ="part_5">248_31,262_123,309</part>
+		<part descript="前腿左", id ="part_6">111_111,115_84,101</part>
+		<part descript="前腿右", id ="part_7">183_138,182_106,173</part>
+		<part descript="躯干后背", id ="part_8">112_211,205_199,220</part>
+		<part descript="躯干胸前", id ="part_9">116_161,145_110,225</part>
+		<part descript="尾巴前", id ="part_10">357_114,407_161,363</part>
+		<part descript="尾巴尖", id ="part_11">375_332,423_321,447</part>
+		<part descript="左脸", id ="part_12">46_307,74_266,126</part>
+		<part descript="右脸", id ="part_13">187_256,240_286,256</part>
+		<part descript="头部", id ="part_14">82_383,152_332,203</part>
+
+    </<player >
+</players> 
+
+

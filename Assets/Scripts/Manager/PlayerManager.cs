@@ -6,13 +6,15 @@ public class PlayerManager : Singleton<PlayerManager>
 {
 
     public Dictionary<int,GameObject> playerDic = new Dictionary<int,GameObject>();
+    public Dictionary<string , PlayerAttribut> playerAttriDic = new Dictionary<string , PlayerAttribut>();
+
     public void CreatePlayer(int id)
     {
         if (!playerDic.ContainsKey(id))
         {
             var newPlayer = Instantiate(Resources.Load("Player/Player_"+id) as GameObject);
             newPlayer.AddComponent<PlayerControl>();
-            newPlayer.GetComponent<PlayerControl>().InitPlayer();
+            newPlayer.GetComponent<PlayerControl>().InitPlayer(id);
             AddPlayer(id , newPlayer);
         }
 
@@ -48,5 +50,9 @@ public class PlayerManager : Singleton<PlayerManager>
         }
     }
 
-
+    private void OnDestroy()
+    {
+        playerAttriDic.Clear();
+        playerDic.Clear();
+    }
 }

@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Xml;
 public class PlayerControl : MonoBehaviour
 {
     private Dictionary<string , Renderer> playerPartRenderDic;
+    private Dictionary<string , Material> playerPartMatDic;
 
 
-    public void InitPlayer()
+    public void InitPlayer(int id)
     {
         playerPartRenderDic=new Dictionary<string , Renderer>();
 
@@ -16,12 +17,31 @@ public class PlayerControl : MonoBehaviour
         {
             playerPartRenderDic.Add(item.name , item.GetComponent<Renderer>());
         }
+
+        playerPartMatDic=new Dictionary<string , Material>();
+        foreach (var item in transform.GetComponentsInChildren<Renderer>(true))
+        {
+            if (item.materials.Length>1)
+            {
+                foreach (var item_mat in item.materials)
+                {
+                    playerPartMatDic.Add(item_mat.name , item_mat);
+                }
+            }
+            else
+            {
+                playerPartMatDic.Add(item.name , item.material);
+            }
+        }
+
+        SerializePlayerXml(id);
+
         EventCenter.AddListener<Texture2D>(MyEventType.setTextureToPlayer , OnSetTexture);
     }
 
     private void OnSetTexture(Texture2D tex)
     {
-        Dictionary<string , Color> _mapDic=new Dictionary<string , Color>();
+        Dictionary<string , Color> _mapDic = new Dictionary<string , Color>();
         SetTextureToPlayer(playerPartRenderDic , _mapDic);
     }
 
@@ -77,4 +97,67 @@ public class PlayerControl : MonoBehaviour
         }
 #endif
     }
+
+    /// <summary>
+    /// 解析角色xml
+    /// </summary>
+    /// <param name="id"></param>
+    private void SerializePlayerXml(int id)
+    {
+        var xmlStr = Resources.Load<TextAsset>("xml/PlayerInfo").text;
+
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.LoadXml(xmlStr);
+
+        XmlNodeList nodeList = xmlDoc.SelectSingleNode("players").ChildNodes;
+        //遍历每一个节点，拿节点的属性以及节点的内容
+        foreach (XmlElement xe in nodeList)
+        {
+            Debug.Log("Attribute NAME:"+xe.GetAttribute("NAME"));
+            Debug.Log("角色 :"+xe.Name);
+            if (xe.GetAttribute("id")==id.ToString())
+            {
+                PlayerAttribut pa = new PlayerAttribut();
+                pa.id=xe.GetAttribute("id");
+                pa.Name=xe.GetAttribute("NAME");
+                pa.partList=new List<PlayerPart>();
+                foreach (XmlElement x1 in xe.ChildNodes)
+                {
+                    PlayerPart pp = new PlayerPart();
+                    pp.matName=x1.GetAttribute("id");
+                    pp.descript=x1.GetAttribute("descript");
+
+                    var pixels = x1.InnerText.Split(',');
+                    for (int i = 0; i<pixels.Length; i++)
+                    {
+                        pp.pixels.Add(new Vector2(int.Parse(pixels[i].Split('_')[0] ), int.Parse(pixels[i].Split('_')[1])));
+                    }
+                    pa.partList.Add(pp);
+                }
+
+                PlayerManager.Instance.playerAttriDic.Add(id.ToString() , pa);
+            }
+
+        }
+
+    }
+    
+}
+
+public class PlayerAttribut
+{
+    public List<PlayerPart> partList;
+
+    public string Name;
+
+    public string id;
+}
+
+public class PlayerPart
+{
+    public List<Vector2> pixels;
+
+    public string descript;
+
+    public string matName;
 }
