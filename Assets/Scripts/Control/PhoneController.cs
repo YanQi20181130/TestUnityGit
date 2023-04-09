@@ -15,6 +15,9 @@ public class PhoneController : MonoBehaviour
     /// 相机画面图像
     /// </summary>
     private WebCamTexture camTexture;
+
+    [SerializeField,Header("动画线框图")]
+    private RawImage outLine;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +26,7 @@ public class PhoneController : MonoBehaviour
         EventCenter.AddListener(MyEventType.takePicture , OnTakePhote);
 
         imgPhoneCameraCanvas.enabled=false;
+        outLine.enabled=false;
     }
     private void OnDestroy()
     {
@@ -75,7 +79,7 @@ public class PhoneController : MonoBehaviour
             EventCenter.Broadcast<Texture2D>(MyEventType.setTextureToPlayer , gettedTex);
             GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraPhotoTaked);
             imgPhoneCameraCanvas.enabled=false;
-
+            outLine.enabled=false;
         }
         else
         {
@@ -116,7 +120,7 @@ public class PhoneController : MonoBehaviour
             camTexture.Play();
 
             imgPhoneCameraCanvas.enabled=true;
-
+            outLine.enabled=true;
             GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraOpend);
 
         }
