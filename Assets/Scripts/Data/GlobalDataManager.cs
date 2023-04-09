@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class GlobalDataManager : Singleton<GlobalDataManager>
 {
-    
+    public static int CurrentPlayerId = 1;
+
 }

@@ -4,18 +4,49 @@ using UnityEngine;
 
 public class PlayerManager : Singleton<PlayerManager>
 {
-    public void SetTextureToPlayer(Dictionary<string , Renderer> _playerPartRenderDic, Dictionary<string , Color>  _mapDic)
+
+    public Dictionary<int,GameObject> playerDic = new Dictionary<int,GameObject>();
+    public void CreatePlayer(int id)
     {
-        foreach (var part in _playerPartRenderDic)
+        if (!playerDic.ContainsKey(id))
         {
-            foreach (var map in _mapDic)
-            {
-                if (map.Key.Equals(part.Key))
-                {
-                    part.Value.material.color=map.Value;
-                    break;
-                }
-            }
+            var newPlayer = Instantiate(Resources.Load("Player/Player_"+id) as GameObject);
+            newPlayer.AddComponent<PlayerControl>();
+            newPlayer.GetComponent<PlayerControl>().InitPlayer();
+            AddPlayer(id , newPlayer);
+        }
+
+        UpdatePlayer(id);
+    }
+
+    public void DestroyPlayer(int id) {
+    if(playerDic.ContainsKey(id)) {
+
+            DestroyImmediate(playerDic[id]);
+            playerDic.Remove(id);
+
         }
     }
+
+    public void UpdatePlayer(int id) {
+        playerDic[id].transform.position=new Vector3(0 , 0 , 0);
+        playerDic[id].SetActive(true );
+    }
+
+
+    public void AddPlayer(int id,GameObject _player) {
+        if (playerDic.ContainsKey(id)==false) {
+            playerDic.Add(id , _player);
+        }
+    } 
+    
+    public void RemovePlayer(int id) {
+        if (playerDic.ContainsKey(id))
+        {
+            playerDic.Remove(id );
+
+        }
+    }
+
+
 }
