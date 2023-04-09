@@ -7,6 +7,8 @@ public class GameMain : MonoBehaviour
     private void Awake()
     {
         InitGame();
+
+        InitGameState();
     }
 
     private void InitGame()
@@ -14,5 +16,8 @@ public class GameMain : MonoBehaviour
         PlayerManager.Instance.CreatePlayer(GlobalDataManager.CurrentPlayerId);
     }
 
-
+    private void InitGameState()
+    {
+        GlobalDataManager.ChangeState(GlobalDataManager.GameState.None);
+    }
 }

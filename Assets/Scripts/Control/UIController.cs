@@ -18,6 +18,9 @@ public class UIController : MonoBehaviour
         openCamera.onClick.AddListener(OpenWebCamDevice);
         takePicture.onClick.AddListener(TakePicture);
         closeCamera.onClick.AddListener(CloseWebCamDevice);
+        closeCamera.gameObject.SetActive(false);
+
+        EventCenter.AddListener<GlobalDataManager.GameState>(MyEventType.stateChanged , ChangeUIState);
     }
 
     /// <summary>
@@ -26,6 +29,7 @@ public class UIController : MonoBehaviour
     void OpenWebCamDevice()
     {
       EventCenter.Broadcast(MyEventType.openCamera);
+
     }
 
     /// <summary>
@@ -43,6 +47,27 @@ public class UIController : MonoBehaviour
     void CloseWebCamDevice()
     {
         EventCenter.Broadcast(MyEventType.closeCamera);
+    }
+
+    private void ChangeUIState(GlobalDataManager.GameState state)
+    {
+        switch (state) {
+            case GlobalDataManager.GameState.cameraOpend:
+            openCamera.gameObject.SetActive(false);
+            takePicture.gameObject.SetActive(true);
+            break;
+
+            case GlobalDataManager.GameState.cameraPhotoTaked:
+            openCamera.gameObject.SetActive(true);
+            takePicture.gameObject.SetActive(false);
+            break;  
+        
+            case GlobalDataManager.GameState.None:
+            openCamera.gameObject.SetActive(true);
+            takePicture.gameObject.SetActive(false);
+            closeCamera.gameObject.SetActive(false);
+            break;
+        }
     }
 }
 

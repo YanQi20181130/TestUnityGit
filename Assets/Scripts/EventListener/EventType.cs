@@ -4,6 +4,7 @@ public enum MyEventType
     closeCamera,
     takePicture,
     setTextureToPlayer,
+    stateChanged,
     ChangeRole,
 
 }

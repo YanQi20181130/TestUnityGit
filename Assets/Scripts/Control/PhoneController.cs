@@ -21,6 +21,8 @@ public class PhoneController : MonoBehaviour
         EventCenter.AddListener(MyEventType.openCamera , OnOpenCamera);
         EventCenter.AddListener(MyEventType.closeCamera , OnCloseCamera);
         EventCenter.AddListener(MyEventType.takePicture , OnTakePhote);
+
+        imgPhoneCameraCanvas.enabled=false;
     }
     private void OnDestroy()
     {
@@ -35,12 +37,12 @@ public class PhoneController : MonoBehaviour
     /// </summary>
     void OnOpenCamera()
     {
-        if (Application.platform==RuntimePlatform.Android)
+        if (Application.platform==RuntimePlatform.Android ||Application.platform==RuntimePlatform.WindowsEditor)
         {
             //安卓
             StartCoroutine(OpenCameraAndroid());
         }
-        else
+        else if (Application.platform==RuntimePlatform.WebGLPlayer&&Application.platform!=RuntimePlatform.WindowsEditor)
         {
             //微信
             OpenWebCamDevice((tex) => {
@@ -54,7 +56,7 @@ public class PhoneController : MonoBehaviour
     /// </summary>
     void OnCloseCamera()
     {
-        if (Application.platform==RuntimePlatform.Android)
+        if (Application.platform==RuntimePlatform.Android||Application.platform==RuntimePlatform.WindowsEditor)
         {
             StopCameraAndroid();
         }
@@ -67,16 +69,20 @@ public class PhoneController : MonoBehaviour
 
     void OnTakePhote()
     {
-        if (Application.platform==RuntimePlatform.Android)
+        if (Application.platform==RuntimePlatform.Android||Application.platform==RuntimePlatform.WindowsEditor)
         {
             var gettedTex = GetTextureFromWebcamera(camTexture);
             EventCenter.Broadcast<Texture2D>(MyEventType.setTextureToPlayer , gettedTex);
+            GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraPhotoTaked);
+            imgPhoneCameraCanvas.enabled=false;
+
         }
         else
         {
 
             
         }
+
     }
 
     #region 安卓拍照
@@ -94,7 +100,13 @@ public class PhoneController : MonoBehaviour
         {
             //先获取设备
             WebCamDevice[] device = WebCamTexture.devices;
+            Debug.Log("摄像头设备数量 = "+device.Length);
 
+            if (device.Length<=0)
+            {
+                Debug.Log("未发现摄像头设备");
+                yield break;
+            }
             string deviceName = device[0].name;
             //然后获取图像
             camTexture=new WebCamTexture(deviceName);
@@ -102,6 +114,10 @@ public class PhoneController : MonoBehaviour
             imgPhoneCameraCanvas.texture=camTexture;
             //开始实施获取
             camTexture.Play();
+
+            imgPhoneCameraCanvas.enabled=true;
+
+            GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraOpend);
 
         }
     }
@@ -112,6 +128,8 @@ public class PhoneController : MonoBehaviour
         if (Application.HasUserAuthorization(UserAuthorization.WebCam))
         {
             camTexture.Stop();
+            imgPhoneCameraCanvas.enabled=false;
+
         }
     }
 
@@ -134,13 +152,15 @@ public class PhoneController : MonoBehaviour
     /// </summary>
     public static void OpenWebCamDevice(System.Action<Texture2D> _onComplete)
     {
-        Debug.Log("Openning camera !");
+        Debug.Log("微信Open camera !");
 
         if (_onComplete==null) return;
 
         ChooseImageOption chooseMedia = new ChooseImageOption
         {
-            complete=(re) => { Debug.Log($"Opened camera- general complete : "+re.errMsg); } ,
+            complete=(re) => {
+                GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraOpend);
+                Debug.Log($"Opened camera- general complete : "+re.errMsg); } ,
             fail=(re) => { Debug.Log($"Opened camera- general failed : "+re.errMsg); } ,
             sizeType=new string[1] { "compressed" } ,
             count=1 ,
