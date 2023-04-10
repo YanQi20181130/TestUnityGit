@@ -121,6 +121,9 @@ public class PhoneController : MonoBehaviour
 
             imgPhoneCameraCanvas.enabled=true;
             outLine.enabled=true;
+            imgPhoneCameraCanvas.gameObject.SetActive(true);
+            outLine.gameObject.SetActive(true);
+        
             GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraOpend);
 
         }

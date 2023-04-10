@@ -91,6 +91,7 @@ public class PlayerControl : MonoBehaviour
             {
                 if (map.Key.Equals(part.Key))
                 {
+                    Debug.Log("上色-  材质名字："+part.Value.name+" , 颜色： "+map.Value);
                     part.Value.color=map.Value;
                     break;
                 }
@@ -130,7 +131,7 @@ public class PlayerControl : MonoBehaviour
             {
 
                 transform.Rotate(Vector3.down*deltaPos.x , Space.World);//绕y轴旋转
-                transform.Rotate(Vector3.right*deltaPos.y , Space.World);//绕x轴
+                //transform.Rotate(Vector3.right*deltaPos.y , Space.World);//绕x轴
             }
         }
 #endif
