@@ -75,7 +75,7 @@ namespace WeChatWASM
             index = 1;
             foreach (GameObject rootObj in scene.GetRootGameObjects()) {
                 if (rootObj.transform.parent == null) {
-                    // Debug.Log(rootObj.name + ":" + rootObj.GetType().Name);
+                    // Debug.Log(rootObj.name + ":" + rootObj.GetType().playerName);
                      Node node = new Node(rootObj, "0");
                      forest.Add(node);
                 }

@@ -3,20 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
+using System.Security.Cryptography;
+
 public class PlayerControl : MonoBehaviour
 {
-    private Dictionary<string , Renderer> playerPartRenderDic;
+ 
+    /// <summary>
+    /// 材质名字，材质
+    /// </summary>
     private Dictionary<string , Material> playerPartMatDic;
-
+    /// <summary>
+    /// 保存此角色ID
+    /// </summary>
+    public string mID;
 
     public void InitPlayer(int id)
     {
-        playerPartRenderDic=new Dictionary<string , Renderer>();
-
-        foreach (var item in transform.GetComponentsInChildren<Renderer>(true))
-        {
-            playerPartRenderDic.Add(item.name , item.GetComponent<Renderer>());
-        }
+        mID=id.ToString();
 
         playerPartMatDic=new Dictionary<string , Material>();
         foreach (var item in transform.GetComponentsInChildren<Renderer>(true))
@@ -41,19 +44,54 @@ public class PlayerControl : MonoBehaviour
 
     private void OnSetTexture(Texture2D tex)
     {
+        //材质名字，贴图颜色
         Dictionary<string , Color> _mapDic = new Dictionary<string , Color>();
-        SetTextureToPlayer(playerPartRenderDic , _mapDic);
+
+        //屏幕转换
+        int offsetY = (Screen.height-int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[1]))/2;
+        int offsetX = (Screen.width-int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[0]))/2;
+
+
+        //计算贴图点位
+        foreach (var item in PlayerManager.Instance.playerAttriDic[mID].partList)
+        {
+            var matName = item.matName;
+
+            //3个像素颜色
+            List<Color> local_pixelColorList = new List<Color>();
+            foreach (var pix in item.pixels)
+            {
+                var oneColor = tex.GetPixel((int)pix.x+offsetX , (int)pix.y+offsetY);
+                if (oneColor!=Color.white)
+                { local_pixelColorList.Add(oneColor); }
+            }
+            //计算颜色平均值
+            float co_r = 0;float co_g = 0; float co_b=0;
+            foreach (var co in local_pixelColorList)
+            {
+                co_r+=co.r;
+                co_g+=co.g; 
+                co_b+=co.b; 
+            }
+            var countColor = local_pixelColorList.Count;
+            //得到平均颜色值
+            Color targetColor=new Color(co_r/countColor , co_g/countColor , co_b/countColor);
+
+            _mapDic.Add(matName , targetColor);  
+        }
+
+        SetTextureToPlayer(playerPartMatDic , _mapDic);
     }
 
-    public void SetTextureToPlayer(Dictionary<string , Renderer> _playerPartRenderDic , Dictionary<string , Color> _mapDic)
+    public void SetTextureToPlayer(Dictionary<string , Material> _playerPartMatDic , Dictionary<string , Color> _mapDic)
     {
-        foreach (var part in _playerPartRenderDic)
+        foreach (var part in _playerPartMatDic)
         {
             foreach (var map in _mapDic)
             {
                 if (map.Key.Equals(part.Key))
                 {
-                    part.Value.material.color=map.Value;
+                    part.Value.color=map.Value;
                     break;
                 }
             }
@@ -113,21 +151,22 @@ public class PlayerControl : MonoBehaviour
         //遍历每一个节点，拿节点的属性以及节点的内容
         foreach (XmlElement xe in nodeList)
         {
-            Debug.Log("Attribute NAME:"+xe.GetAttribute("NAME"));
+            Debug.Log("Attribute playerName:"+xe.GetAttribute("playerName"));
             Debug.Log("角色 :"+xe.Name);
             if (xe.GetAttribute("id")==id.ToString())
             {
                 PlayerAttribut pa = new PlayerAttribut();
                 pa.id=xe.GetAttribute("id");
-                pa.Name=xe.GetAttribute("NAME");
+                pa.playerName=xe.GetAttribute("playerName");
+                pa.size=xe.GetAttribute("size");    
                 pa.partList=new List<PlayerPart>();
                 foreach (XmlElement x1 in xe.ChildNodes)
                 {
                     PlayerPart pp = new PlayerPart();
                     pp.matName=x1.GetAttribute("id");
                     pp.descript=x1.GetAttribute("descript");
-
-                    var pixels = x1.InnerText.Split(',');
+                    pp.pixels=new List<Vector2>();
+                   var pixels = x1.InnerText.Split(',');
                     for (int i = 0; i<pixels.Length; i++)
                     {
                         pp.pixels.Add(new Vector2(int.Parse(pixels[i].Split('_')[0] ), int.Parse(pixels[i].Split('_')[1])));
@@ -148,9 +187,12 @@ public class PlayerAttribut
 {
     public List<PlayerPart> partList;
 
-    public string Name;
+    public string playerName;
 
     public string id;
+
+    public string size; 
+    
 }
 
 public class PlayerPart

@@ -61,7 +61,7 @@ namespace WeChatWASM.Analysis
                 //图标+名称
                 new MultiColumnHeaderState.Column
                 {
-                    headerContent = new GUIContent("Name"),
+                    headerContent = new GUIContent("playerName"),
                     headerTextAlignment = TextAlignment.Center,
                     sortedAscending = false,
                     width = 200,
