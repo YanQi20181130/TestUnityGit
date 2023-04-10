@@ -5,6 +5,7 @@ public enum MyEventType
     takePicture,
     setTextureToPlayer,
     stateChanged,
-    ChangeRole,
+    triggetDebugTool,
+    addDebugPoints,
 
 }

@@ -8,26 +8,41 @@ using WeChatWASM;
 public class PhoneController : MonoBehaviour
 {
     /// <summary>
-    /// Ïà»ú»­Ãæ³ÊÏÖ
+    /// ç›¸æœºç”»é¢å‘ˆç°
     /// </summary>
     public RawImage imgPhoneCameraCanvas;
     /// <summary>
-    /// Ïà»ú»­ÃæÍ¼Ïñ
+    /// ç›¸æœºç”»é¢å›¾åƒ
     /// </summary>
     private WebCamTexture camTexture;
 
-    [SerializeField,Header("¶¯»­Ïß¿òÍ¼")]
+    [SerializeField,Header("åŠ¨ç”»çº¿æ¡†å›¾")]
     private RawImage outLine;
+    public Texture2D testMap;
+    public CanvasScaler mCanvaScaler;
+
     // Start is called before the first frame update
     void Start()
     {
+        mCanvaScaler.referenceResolution=new Vector2((float)Screen.width , (float)Screen.height);
+
+
         EventCenter.AddListener(MyEventType.openCamera , OnOpenCamera);
         EventCenter.AddListener(MyEventType.closeCamera , OnCloseCamera);
         EventCenter.AddListener(MyEventType.takePicture , OnTakePhote);
-
+        EventCenter.AddListener<bool>(MyEventType.triggetDebugTool , triggetDebugTool);
         imgPhoneCameraCanvas.enabled=false;
         outLine.enabled=false;
+
+
     }
+
+    private void triggetDebugTool(bool arg)
+    {
+        imgPhoneCameraCanvas.enabled=arg;
+        outLine.enabled=arg;
+    }
+
     private void OnDestroy()
     {
         EventCenter.RemoveListener(MyEventType.openCamera , OnOpenCamera);
@@ -36,6 +51,15 @@ public class PhoneController : MonoBehaviour
 
         camTexture=null;
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            EventCenter.Broadcast<Texture2D>(MyEventType.setTextureToPlayer , testMap);
+            GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraPhotoTaked);
+            Debug.Log("å®‰å“ æ‹ç…§ "+testMap.height);
+        }
+    }
     /// <summary>
     /// Open Media
     /// </summary>
@@ -43,12 +67,12 @@ public class PhoneController : MonoBehaviour
     {
         if (Application.platform==RuntimePlatform.Android ||Application.platform==RuntimePlatform.WindowsEditor)
         {
-            //°²×¿
+            //å®‰å“
             StartCoroutine(OpenCameraAndroid());
         }
         else if (Application.platform==RuntimePlatform.WebGLPlayer&&Application.platform!=RuntimePlatform.WindowsEditor)
         {
-            //Î¢ĞÅ
+            //å¾®ä¿¡
             OpenWebCamDevice((tex) => {
                 EventCenter.Broadcast<Texture2D>(MyEventType.setTextureToPlayer , tex);
             });
@@ -75,9 +99,11 @@ public class PhoneController : MonoBehaviour
     {
         if (Application.platform==RuntimePlatform.Android||Application.platform==RuntimePlatform.WindowsEditor)
         {
+          
             var gettedTex = GetTextureFromWebcamera(camTexture);
             EventCenter.Broadcast<Texture2D>(MyEventType.setTextureToPlayer , gettedTex);
             GlobalDataManager.ChangeState(GlobalDataManager.GameState.cameraPhotoTaked);
+
             imgPhoneCameraCanvas.enabled=false;
             outLine.enabled=false;
         }
@@ -89,35 +115,42 @@ public class PhoneController : MonoBehaviour
 
     }
 
-    #region °²×¿ÅÄÕÕ
+    #region å®‰å“æ‹ç…§
 
     /// <summary>
-    /// °²×¿´ò¿¨Ïà»ú
+    /// å®‰å“æ‰“å¡ç›¸æœº
     /// </summary>
     /// <returns></returns>
     private IEnumerator OpenCameraAndroid()
     {
-        //µÈ´ıÓÃ»§ÔÊĞí·ÃÎÊ
+        //ç­‰å¾…ç”¨æˆ·å…è®¸è®¿é—®
         yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
-        //Èç¹ûÓÃ»§ÔÊĞí·ÃÎÊ£¬¿ªÊ¼»ñÈ¡Í¼Ïñ        
+        //å¦‚æœç”¨æˆ·å…è®¸è®¿é—®ï¼Œå¼€å§‹è·å–å›¾åƒ        
         if (Application.HasUserAuthorization(UserAuthorization.WebCam))
         {
-            //ÏÈ»ñÈ¡Éè±¸
+            //å…ˆè·å–è®¾å¤‡
             WebCamDevice[] device = WebCamTexture.devices;
-            Debug.Log("ÉãÏñÍ·Éè±¸ÊıÁ¿ = "+device.Length);
+            Debug.Log("æ‘„åƒå¤´è®¾å¤‡æ•°é‡ = "+device.Length+"ï¼Œå±å¹•å°ºå¯¸-å®½åº¦ï¼š"+Screen.width+" , é«˜åº¦ï¼š"+Screen.height);
 
             if (device.Length<=0)
             {
-                Debug.Log("Î´·¢ÏÖÉãÏñÍ·Éè±¸");
+                Debug.Log("æœªå‘ç°æ‘„åƒå¤´è®¾å¤‡");
                 yield break;
             }
             string deviceName = device[0].name;
-            //È»ºó»ñÈ¡Í¼Ïñ
-            camTexture=new WebCamTexture(deviceName);
-            //½«»ñÈ¡µÄÍ¼Ïñ¸³Öµ
+            //ç„¶åè·å–å›¾åƒ
+            camTexture=new WebCamTexture(deviceName , Screen.width , Screen.height , 60);
+
+            //å°†è·å–çš„å›¾åƒèµ‹å€¼
             imgPhoneCameraCanvas.texture=camTexture;
-            //¿ªÊ¼ÊµÊ©»ñÈ¡
+
+            //å¼€å§‹å®æ–½è·å–
             camTexture.Play();
+
+            Debug.Log("æ‘„åƒå¤´å°ºå¯¸ = "+camTexture.width+","+camTexture.height+
+                " ui image size ="+imgPhoneCameraCanvas.texture.width
+                );
+
 
             imgPhoneCameraCanvas.enabled=true;
             outLine.enabled=true;
@@ -128,7 +161,7 @@ public class PhoneController : MonoBehaviour
 
     void StopCameraAndroid()
     {
-        //Èç¹ûÓÃ»§ÔÊĞí·ÃÎÊ£¬¿ªÊ¼»ñÈ¡Í¼Ïñ        
+        //å¦‚æœç”¨æˆ·å…è®¸è®¿é—®ï¼Œå¼€å§‹è·å–å›¾åƒ        
         if (Application.HasUserAuthorization(UserAuthorization.WebCam))
         {
             camTexture.Stop();
@@ -140,7 +173,7 @@ public class PhoneController : MonoBehaviour
     public Texture2D GetTextureFromWebcamera(WebCamTexture t)
     {
         Texture2D t2d = new Texture2D(t.width , t.height , TextureFormat.RGB24 , true);
-        //½«WebCamTexture µÄÏñËØ±£´æµ½texture2DÖĞ
+        //å°†WebCamTexture çš„åƒç´ ä¿å­˜åˆ°texture2Dä¸­
         t2d.SetPixels(t.GetPixels());
         //t2d.ReadPixels(new Rect(200,200,200,200),0,0,false);
         t2d.Apply();
@@ -149,14 +182,14 @@ public class PhoneController : MonoBehaviour
 
     #endregion
 
-    #region Î¢ĞÅOpen Media
+    #region å¾®ä¿¡Open Media
 
     /// <summary>
-    /// ´ò¿ªÉãÏñÍ·
+    /// æ‰“å¼€æ‘„åƒå¤´
     /// </summary>
     public static void OpenWebCamDevice(System.Action<Texture2D> _onComplete)
     {
-        Debug.Log("Î¢ĞÅOpen camera !");
+        Debug.Log("å¾®ä¿¡Open camera !");
 
         if (_onComplete==null) return;
 
@@ -169,11 +202,11 @@ public class PhoneController : MonoBehaviour
             sizeType=new string[1] { "compressed" } ,
             count=1 ,
             sourceType=new string[2] { "camera" , "album" } ,
-            //ÅÄÕÕ³É¹¦ºó
+            //æ‹ç…§æˆåŠŸå
             success=(result) => {
-                // »ñÈ¡Í¼Æ¬µØÖ·
+                // è·å–å›¾ç‰‡åœ°å€
                 var tempPath = result.tempFilePaths[0];
-                // ´ÓÍ¼Æ¬µØÖ·È¡Í¼Æ¬
+                // ä»å›¾ç‰‡åœ°å€å–å›¾ç‰‡
                 var bytes = WX.GetFileSystemManager().ReadFileSync(tempPath);
                 Texture2D texture = new Texture2D(512 , 512);
                 texture.LoadImage(bytes);
@@ -183,7 +216,7 @@ public class PhoneController : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogError("Î´ÕÒµ½½ÇÉ«");
+                    Debug.LogError("æœªæ‰¾åˆ°è§’è‰²");
                 }
             }
         };

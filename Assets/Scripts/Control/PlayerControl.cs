@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 public class PlayerControl : MonoBehaviour
 {
- 
+
     /// <summary>
     /// 材质名字，材质
     /// </summary>
@@ -33,24 +33,31 @@ public class PlayerControl : MonoBehaviour
             }
             else
             {
-                playerPartMatDic.Add(item.name , item.material);
+                playerPartMatDic.Add(item.material.name , item.material);
             }
+
         }
 
         SerializePlayerXml(id);
 
         EventCenter.AddListener<Texture2D>(MyEventType.setTextureToPlayer , OnSetTexture);
+
+        Debug.Log("角色初始化 "+id);
     }
 
     private void OnSetTexture(Texture2D tex)
     {
+        Debug.Log("角色 换色 , 图片名字是："+tex.name);
+
         //材质名字，贴图颜色
         Dictionary<string , Color> _mapDic = new Dictionary<string , Color>();
 
         //屏幕转换
         int offsetY = (Screen.height-int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[1]))/2;
         int offsetX = (Screen.width-int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[0]))/2;
-
+        Debug.Log("屏幕转换 , offsetY = "+offsetY+" , offsetX="+offsetX);
+        int debugOffsetY = int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[1])/2;
+        int debugOffsetX = int.Parse(PlayerManager.Instance.playerAttriDic[mID].size.Split('*')[0])/2;
 
         //计算贴图点位
         foreach (var item in PlayerManager.Instance.playerAttriDic[mID].partList)
@@ -62,22 +69,17 @@ public class PlayerControl : MonoBehaviour
             foreach (var pix in item.pixels)
             {
                 var oneColor = tex.GetPixel((int)pix.x+offsetX , (int)pix.y+offsetY);
+
+                EventCenter.Broadcast(MyEventType.addDebugPoints , new Vector2(pix.x-debugOffsetX , pix.y-debugOffsetY) , oneColor);
+
                 if (oneColor!=Color.white)
                 { local_pixelColorList.Add(oneColor); }
             }
-            //计算颜色平均值
-            float co_r = 0;float co_g = 0; float co_b=0;
-            foreach (var co in local_pixelColorList)
-            {
-                co_r+=co.r;
-                co_g+=co.g; 
-                co_b+=co.b; 
-            }
-            var countColor = local_pixelColorList.Count;
-            //得到平均颜色值
-            Color targetColor=new Color(co_r/countColor , co_g/countColor , co_b/countColor);
 
-            _mapDic.Add(matName , targetColor);  
+            //得到平均颜色值
+            Color targetColor = GetColorMax(local_pixelColorList);
+
+            _mapDic.Add(matName , targetColor);
         }
 
         SetTextureToPlayer(playerPartMatDic , _mapDic);
@@ -85,18 +87,70 @@ public class PlayerControl : MonoBehaviour
 
     public void SetTextureToPlayer(Dictionary<string , Material> _playerPartMatDic , Dictionary<string , Color> _mapDic)
     {
+        Debug.Log("屏幕转换 , _playerPartMatDic Count = "+_playerPartMatDic.Count+" , _mapDic Count="+_mapDic.Count);
+
         foreach (var part in _playerPartMatDic)
         {
             foreach (var map in _mapDic)
             {
-                if (map.Key.Equals(part.Key))
+                //map.Key：part_3 , part.Key：part_3 (Instance)
+                //Debug.Log("map.Key："+map.Key+" , part.Key："+part.Key);
+                if (part.Key.Contains(map.Key))
                 {
+                    //Debug.Log("材质球："+part.Value+" , 颜色："+map.Value);
                     part.Value.color=map.Value;
+                    //part.Value.SetColor("_BaseTint" , map.Value);
                     break;
                 }
             }
         }
     }
+
+
+    private Color GetColorPingJun(List<Color> local_pixelColorList)
+    {
+        //计算颜色平均值
+        float co_r = 0; float co_g = 0; float co_b = 0;
+        foreach (var co in local_pixelColorList)
+        {
+            co_r+=co.r;
+            co_g+=co.g;
+            co_b+=co.b;
+        }
+        var countColor = local_pixelColorList.Count;
+        //得到平均颜色值
+        Color targetColor = new Color(co_r/countColor , co_g/countColor , co_b/countColor);
+        return targetColor; 
+    }
+
+    private Color GetColorMax(List<Color> local_pixelColorList)
+    {
+        //计算颜色平均值
+        float co_r = 1; float co_g = 1; float co_b = 1;
+        Color targetColor=new Color(1,1,1);
+        foreach (var co in local_pixelColorList)
+        {
+            if (co_r>co.r)
+            {
+                co_r=co.r;
+                targetColor=co;
+            }
+            if (co_g>co.g)
+            {
+                co_r=co.g;
+                targetColor=co;
+            }
+            if (co_b>co.b)
+            {
+                co_r=co.b;
+                targetColor=co;
+            }
+
+        }
+
+        return targetColor;
+    }
+
     // Update is called once per frame 
     void Update()
     {
@@ -110,10 +164,10 @@ public class PlayerControl : MonoBehaviour
         //如果鼠标左键按下
         if (Input.GetMouseButton(0))
         {
-            float speed = 2.5f;//旋转跟随速度
+            float speed = 5f;//旋转跟随速度
             float OffsetX = Input.GetAxis("Mouse X");//获取鼠标x轴的偏移量
-            float OffsetY = Input.GetAxis("Mouse Y");//获取鼠标y轴的偏移量
-            transform.Rotate(new Vector3(OffsetY , -OffsetX , 0)*speed , Space.World);//旋转物体
+            //float OffsetY = Input.GetAxis("Mouse Y");//获取鼠标y轴的偏移量
+            transform.Rotate(new Vector3(0 , -OffsetX , 0)*speed , Space.World);//旋转物体
         }
 #else
         //没有触摸  
@@ -126,11 +180,11 @@ public class PlayerControl : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             Vector2 deltaPos = touch.deltaPosition;//位置增量
 
-            if (Mathf.Abs(deltaPos.x)>=3||Mathf.Abs(deltaPos.y)>=3)
+            if (Mathf.Abs(deltaPos.x)>=2||Mathf.Abs(deltaPos.y)>=2)
             {
 
                 transform.Rotate(Vector3.down*deltaPos.x , Space.World);//绕y轴旋转
-                transform.Rotate(Vector3.right*deltaPos.y , Space.World);//绕x轴
+                //transform.Rotate(Vector3.right*deltaPos.y , Space.World);//绕x轴
             }
         }
 #endif
@@ -158,7 +212,7 @@ public class PlayerControl : MonoBehaviour
                 PlayerAttribut pa = new PlayerAttribut();
                 pa.id=xe.GetAttribute("id");
                 pa.playerName=xe.GetAttribute("playerName");
-                pa.size=xe.GetAttribute("size");    
+                pa.size=xe.GetAttribute("size");
                 pa.partList=new List<PlayerPart>();
                 foreach (XmlElement x1 in xe.ChildNodes)
                 {
@@ -166,10 +220,10 @@ public class PlayerControl : MonoBehaviour
                     pp.matName=x1.GetAttribute("id");
                     pp.descript=x1.GetAttribute("descript");
                     pp.pixels=new List<Vector2>();
-                   var pixels = x1.InnerText.Split(',');
+                    var pixels = x1.InnerText.Split(',');
                     for (int i = 0; i<pixels.Length; i++)
                     {
-                        pp.pixels.Add(new Vector2(int.Parse(pixels[i].Split('_')[0] ), int.Parse(pixels[i].Split('_')[1])));
+                        pp.pixels.Add(new Vector2(int.Parse(pixels[i].Split('_')[0]) , int.Parse(pixels[i].Split('_')[1])));
                     }
                     pa.partList.Add(pp);
                 }
@@ -180,7 +234,7 @@ public class PlayerControl : MonoBehaviour
         }
 
     }
-    
+
 }
 
 public class PlayerAttribut
@@ -191,8 +245,8 @@ public class PlayerAttribut
 
     public string id;
 
-    public string size; 
-    
+    public string size;
+
 }
 
 public class PlayerPart
