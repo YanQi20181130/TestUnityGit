@@ -164,6 +164,7 @@ public class PhoneController : MonoBehaviour
         //如果用户允许访问，开始获取图像        
         if (Application.HasUserAuthorization(UserAuthorization.WebCam))
         {
+            if (camTexture==null) return;
             camTexture.Stop();
             imgPhoneCameraCanvas.enabled=false;
 

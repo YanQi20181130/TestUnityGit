@@ -97,7 +97,7 @@ public class PlayerControl : MonoBehaviour
                 //Debug.Log("map.Key£º"+map.Key+" , part.Key£º"+part.Key);
                 if (part.Key.Contains(map.Key))
                 {
-                    //Debug.Log("²ÄÖÊÇò£º"+part.Value+" , ÑÕÉ«£º"+map.Value);
+                    Debug.Log("**ÅäÖÃÑÕÉ«£º  ²ÄÖÊÇò£º"+part.Value+" , ÑÕÉ«£º"+map.Value);
                     part.Value.color=map.Value;
                     //part.Value.SetColor("_BaseTint" , map.Value);
                     break;
@@ -140,7 +140,7 @@ public class PlayerControl : MonoBehaviour
                 co_r=co.g;
                 targetColor=co;
             }
-            if (co_b>co.b)
+             if (co_b>co.b)
             {
                 co_r=co.b;
                 targetColor=co;
@@ -217,7 +217,7 @@ public class PlayerControl : MonoBehaviour
                 foreach (XmlElement x1 in xe.ChildNodes)
                 {
                     PlayerPart pp = new PlayerPart();
-                    pp.matName=x1.GetAttribute("id");
+                    pp.matName=x1.GetAttribute("materialName");
                     pp.descript=x1.GetAttribute("descript");
                     pp.pixels=new List<Vector2>();
                     var pixels = x1.InnerText.Split(',');

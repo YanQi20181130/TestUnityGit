@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <players>
     <player id="1"  playerName="狐狸"  size="512*512">
-           
-        <part descript="耳朵左"  id ="part_1">38_443,34_415,52_408</part>
-		<part descript="耳朵右"  id ="part_2">236_432,256_437,264_406</part>
-		<part descript="鼻子"  id ="part_3">154_256,153_239,159_243</part>
-		<part descript="后腿左"  id ="part_4">197_38,212_41,198_30</part>
-		<part descript="后腿右"  id ="part_5">248_31,262_123,309_74</part>
-		<part descript="前腿左"  id ="part_6">111_111,115_84,101_45</part>
-		<part descript="前腿右"  id ="part_7">183_138,182_106,173_56</part>
-		<part descript="躯干后背"  id ="part_8">112_211,205_199,220_117</part>
-		<part descript="躯干胸前"  id ="part_9">116_161,145_110,225_60</part>
-		<part descript="尾巴前"  id ="part_10">357_114,407_161,363_237</part>
-		<part descript="尾巴尖"  id ="part_11">375_332,423_321,447_361</part>
-		<part descript="左脸"  id ="part_12">46_307,74_266,126_248</part>
-		<part descript="右脸"  id ="part_13">187_256,240_286,256_320</part>
-		<part descript="头部"  id ="part_14">82_383,152_332,203_384</part>
-
+        <part descript="耳朵左"  materialName ="ErDuoZuo">38_443,34_415,52_408</part>
+		<part descript="耳朵右"  materialName ="ErDuoYou">236_432,256_437,264_406</part>
+		<part descript="鼻子"  materialName ="BiZi">154_256,153_239,159_243</part>
+		<part descript="后腿左"  materialName ="HouTuiZuo">197_38,212_41,198_30</part>
+		<part descript="后腿右"  materialName ="HouTuiYou">248_31,262_123,309_74</part>
+		<part descript="前腿左"  materialName ="QianTuiZuo">111_111,115_84,101_45</part>
+		<part descript="前腿右"  materialName ="QianTuiYou">183_138,182_106,173_56</part>
+		<part descript="躯干后背"  materialName ="ShenTiHou">112_211,205_199,220_117</part>
+		<part descript="躯干胸前"  materialName ="ShenTiQian">116_161,145_110,225_60</part>
+		<part descript="尾巴前"  materialName ="WeiBaQian">357_114,407_161,363_237</part>
+		<part descript="尾巴尖"  materialName ="WeiBaJian">375_332,423_321,447_361</part>
+		<part descript="左脸"  materialName ="ZuoLian">46_307,74_266,126_248</part>
+		<part descript="右脸"  materialName ="YouLian">187_256,240_286,256_320</part>
+		<part descript="头部"  materialName ="TouBu">82_383,152_332,203_384</part>
     </player>
+
 </players> 
 
 
