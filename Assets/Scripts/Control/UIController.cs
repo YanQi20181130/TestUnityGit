@@ -37,8 +37,8 @@ public class UIController : MonoBehaviour
     /// </summary>
     void TakePicture()
     {
-        EventCenter.Broadcast(MyEventType.takePicture); 
-        
+        EventCenter.Broadcast(MyEventType.takePicture);
+       
     }
 
     /// <summary>
@@ -60,6 +60,7 @@ public class UIController : MonoBehaviour
             case GlobalDataManager.GameState.cameraPhotoTaked:
             openCamera.gameObject.SetActive(true);
             takePicture.gameObject.SetActive(false);
+            CloseWebCamDevice();
             break;  
         
             case GlobalDataManager.GameState.None:
