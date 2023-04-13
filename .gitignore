@@ -31,3 +31,9 @@ ehthumbs.db
 Thumbs.db
 /Logs
 /ProjectSettings
+/buil
+/.vsconfig
+/*.apk
+/df
+/.idea
+/.vs
